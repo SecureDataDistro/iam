@@ -1,0 +1,27 @@
+{
+  "name": "iam",
+  "version": "0.0.1",
+  "description": "Identity and Authx Management",
+  "main": "index.ts",
+  "repository": "git@github.com:SecureDataDistro/iam.git",
+  "author": "j.taylor <j.taylor@orbisops.com>",
+  "license": "Elastic-2.0",
+  "private": false,
+  "scripts": {
+    "build": "yarn esbuild ./index.ts --outfile=./dist/index.js --bundle --platform=node --target=node18 --log-level=error",
+    "cli": "npx run-func ./dist/index.js CLI"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.2",
+    "esbuild": "^0.18.6",
+    "run-func": "^3.0.0"
+  },
+  "dependencies": {
+    "@hub": "https://github.com/SecureDataDistro/jwt.git#0.0.1",
+    "axios": "^1.4.0",
+    "chalk": "^5.2.0",
+    "commander": "^11.0.0",
+    "minimatch": "^9.0.1",
+    "minimist": "^1.2.8"
+  }
+}
