@@ -1,6 +1,7 @@
 import {Authorizer as authorizer, Signer as signer, DataRepoURN, UserURN} from "./src";
 import { Command } from 'commander';
 import chalk from "chalk";
+import fs from "fs";
 
 export const Authorizer = authorizer;
 
@@ -17,6 +18,7 @@ export async function CLI(){
         .requiredOption('-u, --user <orgId>:<userId>', 'user entity for jwt')
         .option('-c, --claims <orgId:repoId>,<orgId:repoId>,...', 'comma-separate list of claims in format <OrgId>:<RepoId>')
         .option("--expiresIn <number>", "seconds until the token will expire")
+        .option("-f, --file <path>", "write token to output file")
         .action(async (opts) => {
             const endpoint = String(opts.endpoint);
             console.log(chalk.greenBright(`* using signing service at ${endpoint}`))
@@ -42,6 +44,10 @@ export async function CLI(){
             }
             const jwtString = (await client.requestSigning(jwtReq))
             console.log(chalk.greenBright("* token: "), jwtString.token);
+
+            if (opts.file) {
+                fs.writeFileSync(opts.file, jwtString.token);
+            }
         })
 
     program.command('verify')
