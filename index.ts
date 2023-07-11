@@ -15,14 +15,19 @@ export async function CLI(){
         .description('use the jwt signing service to sign a jwt')
         .requiredOption('-e, --endpoint <http(s)://domain/token>', 'jwt signing service endpoint')
         .requiredOption('-u, --user <orgId>:<userId>', 'user entity for jwt')
-        .requiredOption('-c, --claims <orgId:repoId>,<orgId:repoId>,...', 'comma-separate list of claims in format <OrgId>:<RepoId>')
+        .option('-c, --claims <orgId:repoId>,<orgId:repoId>,...', 'comma-separate list of claims in format <OrgId>:<RepoId>')
+        .option("--expiresIn <number>", "seconds until the token will expire")
         .action(async (opts) => {
             const endpoint = String(opts.endpoint);
             console.log(chalk.greenBright(`* using signing service at ${endpoint}`))
             const entity = new UserURN(String(opts.user));
-            const claims = String(opts.claims).split(",").map(claim => {
-                return new DataRepoURN(claim)
-            });
+
+            let claims: DataRepoURN[] = [];
+            if (opts.claims && opts.claims.length > 0) {
+                claims = String(opts.claims).split(",").map(claim => {
+                    return new DataRepoURN(claim)
+                });
+            }
 
             console.log(chalk.greenBright(`* signing jwt for user ${entity.urn} with claims:`));
             claims.forEach(claim => {console.log(chalk.greenBright(`* \t- ${claim.urn}`))});
@@ -32,7 +37,8 @@ export async function CLI(){
                 entity: entity.urn,
                 claims: claims.map(claim => {
                     return claim.urn
-                })
+                }),
+                expiresIn: opts.expiresIn? Number(opts.expiresIn) : undefined,
             }
             const jwtString = (await client.requestSigning(jwtReq))
             console.log(chalk.greenBright("* token: "), jwtString.token);
